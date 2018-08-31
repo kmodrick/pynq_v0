@@ -204,22 +204,31 @@ proc create_hier_cell_filter { parentCell nameHier } {
   # Create instance: fir, and set properties
   set fir [ create_bd_cell -type ip -vlnv xilinx.com:ip:fir_compiler:7.2 fir ]
   set_property -dict [ list \
-   CONFIG.Clock_Frequency {100} \
-   CONFIG.CoefficientVector {-255,-260,-312,-288,-144,153,616,1233,1963,2739,3474,4081,4481,4620,4481,4081,3474,2739,1963,1233,616,153,-144,-288,-312,-260,-255} \
+   CONFIG.Clock_Frequency {25} \
+   CONFIG.CoefficientSource {Vector} \
+   CONFIG.CoefficientVector {-181,-35,-38,-41,-44,-46,-48,-49,-50,-50,-49,-48,-46,-43,-40,-35,-29,-22,-14,-5,5,17,30,44,60,77,95,114,135,157,180,204,229,255,282,310,339,368,398,428,458,489,519,549,579,608,637,665,693,719,744,768,790,811,830,848,864,877,889,899,907,912,916,917,916,912,907,899,889,877,864,848,830,811,790,768,744,719,693,665,637,608,579,549,519,489,458,428,398,368,339,310,282,255,229,204,180,157,135,114,95,77,60,44,30,17,5,-5,-14,-22,-29,-35,-40,-43,-46,-48,-49,-50,-50,-49,-48,-46,-44,-41,-38,-35,-181} \
    CONFIG.Coefficient_Fractional_Bits {0} \
+   CONFIG.Coefficient_Reload {false} \
    CONFIG.Coefficient_Sets {1} \
    CONFIG.Coefficient_Sign {Signed} \
    CONFIG.Coefficient_Structure {Inferred} \
    CONFIG.Coefficient_Width {16} \
-   CONFIG.ColumnConfig {14} \
+   CONFIG.ColumnConfig {60,4} \
    CONFIG.DATA_Has_TLAST {Packet_Framing} \
    CONFIG.Data_Width {32} \
+   CONFIG.Decimation_Rate {1} \
    CONFIG.Filter_Architecture {Systolic_Multiply_Accumulate} \
+   CONFIG.Filter_Selection {1} \
+   CONFIG.Filter_Type {Single_Rate} \
+   CONFIG.Interpolation_Rate {1} \
    CONFIG.M_DATA_Has_TREADY {true} \
+   CONFIG.Number_Channels {1} \
    CONFIG.Output_Rounding_Mode {Non_Symmetric_Rounding_Up} \
    CONFIG.Output_Width {32} \
    CONFIG.Quantization {Integer_Coefficients} \
-   CONFIG.Sample_Frequency {100} \
+   CONFIG.RateSpecification {Frequency_Specification} \
+   CONFIG.Sample_Frequency {25} \
+   CONFIG.Zero_Pack_Factor {1} \
  ] $fir
 
   # Create instance: fir_dma, and set properties
@@ -303,7 +312,7 @@ proc create_root_design { parentCell } {
    CONFIG.PCW_ACT_DCI_PERIPHERAL_FREQMHZ {10.096154} \
    CONFIG.PCW_ACT_ENET0_PERIPHERAL_FREQMHZ {125.000000} \
    CONFIG.PCW_ACT_ENET1_PERIPHERAL_FREQMHZ {10.000000} \
-   CONFIG.PCW_ACT_FPGA0_PERIPHERAL_FREQMHZ {100.000000} \
+   CONFIG.PCW_ACT_FPGA0_PERIPHERAL_FREQMHZ {25.000000} \
    CONFIG.PCW_ACT_FPGA1_PERIPHERAL_FREQMHZ {10.000000} \
    CONFIG.PCW_ACT_FPGA2_PERIPHERAL_FREQMHZ {10.000000} \
    CONFIG.PCW_ACT_FPGA3_PERIPHERAL_FREQMHZ {10.000000} \
@@ -341,7 +350,7 @@ proc create_root_design { parentCell } {
    CONFIG.PCW_CAN_PERIPHERAL_DIVISOR1 {1} \
    CONFIG.PCW_CAN_PERIPHERAL_FREQMHZ {100} \
    CONFIG.PCW_CAN_PERIPHERAL_VALID {0} \
-   CONFIG.PCW_CLK0_FREQ {100000000} \
+   CONFIG.PCW_CLK0_FREQ {25000000} \
    CONFIG.PCW_CLK1_FREQ {10000000} \
    CONFIG.PCW_CLK2_FREQ {10000000} \
    CONFIG.PCW_CLK3_FREQ {10000000} \
@@ -465,8 +474,8 @@ proc create_root_design { parentCell } {
    CONFIG.PCW_EN_USB1 {0} \
    CONFIG.PCW_EN_WDT {0} \
    CONFIG.PCW_FCLK0_PERIPHERAL_CLKSRC {IO PLL} \
-   CONFIG.PCW_FCLK0_PERIPHERAL_DIVISOR0 {5} \
-   CONFIG.PCW_FCLK0_PERIPHERAL_DIVISOR1 {2} \
+   CONFIG.PCW_FCLK0_PERIPHERAL_DIVISOR0 {8} \
+   CONFIG.PCW_FCLK0_PERIPHERAL_DIVISOR1 {5} \
    CONFIG.PCW_FCLK1_PERIPHERAL_CLKSRC {IO PLL} \
    CONFIG.PCW_FCLK1_PERIPHERAL_DIVISOR0 {1} \
    CONFIG.PCW_FCLK1_PERIPHERAL_DIVISOR1 {1} \
@@ -480,7 +489,7 @@ proc create_root_design { parentCell } {
    CONFIG.PCW_FCLK_CLK1_BUF {FALSE} \
    CONFIG.PCW_FCLK_CLK2_BUF {FALSE} \
    CONFIG.PCW_FCLK_CLK3_BUF {FALSE} \
-   CONFIG.PCW_FPGA0_PERIPHERAL_FREQMHZ {100} \
+   CONFIG.PCW_FPGA0_PERIPHERAL_FREQMHZ {25} \
    CONFIG.PCW_FPGA1_PERIPHERAL_FREQMHZ {50} \
    CONFIG.PCW_FPGA2_PERIPHERAL_FREQMHZ {50} \
    CONFIG.PCW_FPGA3_PERIPHERAL_FREQMHZ {50} \
