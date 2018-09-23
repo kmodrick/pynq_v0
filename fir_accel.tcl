@@ -158,13 +158,13 @@ if { $bCheckIPsPassed != 1 } {
 ##################################################################
 
 
-# Hierarchical cell: filterI
-proc create_hier_cell_filterI { parentCell nameHier } {
+# Hierarchical cell: filter
+proc create_hier_cell_filter { parentCell nameHier } {
 
   variable script_folder
 
   if { $parentCell eq "" || $nameHier eq "" } {
-     catch {common::send_msg_id "BD_TCL-102" "ERROR" "create_hier_cell_filterI() - Empty argument(s)!"}
+     catch {common::send_msg_id "BD_TCL-102" "ERROR" "create_hier_cell_filter() - Empty argument(s)!"}
      return
   }
 
@@ -213,8 +213,8 @@ proc create_hier_cell_filterI { parentCell nameHier } {
    CONFIG.Channel_Sequence {Basic} \
    CONFIG.Clock_Frequency {200} \
    CONFIG.CoefficientSource {Vector} \
-   CONFIG.CoefficientVector {-181,-35,-38,-41,-44,-46,-48,-49,-50,-50,-49,-48,-46,-43,-40,-35,-29,-22,-14,-5,5,17,30,44,60,77,95,114,135,157,180,204,229,255,282,310,339,368,398,428,458,489,519,549,579,608,637,665,693,719,744,768,790,811,830,848,864,877,889,899,907,912,916,917,916,912,907,899,889,877,864,848,830,811,790,768,744,719,693,665,637,608,579,549,519,489,458,428,398,368,339,310,282,255,229,204,180,157,135,114,95,77,60,44,30,17,5,-5,-14,-22,-29,-35,-40,-43,-46,-48,-49,-50,-50,-49,-48,-46,-44,-41,-38,-35,-181} \
-   CONFIG.Coefficient_Fractional_Bits {0} \
+   CONFIG.CoefficientVector {-6.59606719e-10, -3.79449254e-10,  5.77858888e-09,  1.80120709e-08,         1.37236447e-08, -4.63388568e-08, -1.48190233e-07, -1.40444127e-07,         1.85982175e-07,  7.45665718e-07,  8.42507181e-07, -4.17198277e-07,        -2.75388846e-06, -3.65381785e-06,  1.22378424e-07,  8.05925563e-06,         1.25871101e-05,  3.48016653e-06, -1.93456704e-05, -3.62596319e-05,        -1.86613925e-05,  3.83406311e-05,  9.00928771e-05,  6.47981575e-05,        -6.08234217e-05, -1.96856983e-04, -1.79854873e-04,  6.67936231e-05,         3.82692382e-04,  4.27613723e-04, -5.26718682e-06, -6.65269542e-04,        -9.00613493e-04, -2.24634461e-04,  1.03170475e-03,  1.71368839e-03,         7.92072017e-04, -1.40641451e-03, -2.98406805e-03, -1.94701169e-03,         1.61210870e-03,  4.79792636e-03,  4.02465906e-03, -1.32739911e-03,        -7.16942140e-03, -7.45089824e-03,  3.54774587e-05,  1.00044175e-02,         1.27862154e-02,  3.07631324e-03, -1.30840520e-02, -2.09257875e-02,        -9.42852758e-03,  1.60804903e-02,  3.38926270e-02,  2.22987080e-02,        -1.86081968e-02, -5.86674672e-02, -5.40206022e-02,  2.03014631e-02,         1.45603123e-01,  2.63969401e-01,  3.12435613e-01,  2.63969401e-01,         1.45603123e-01,  2.03014631e-02, -5.40206022e-02, -5.86674672e-02,        -1.86081968e-02,  2.22987080e-02,  3.38926270e-02,  1.60804903e-02,        -9.42852758e-03, -2.09257875e-02, -1.30840520e-02,  3.07631324e-03,         1.27862154e-02,  1.00044175e-02,  3.54774587e-05, -7.45089824e-03,        -7.16942140e-03, -1.32739911e-03,  4.02465906e-03,  4.79792636e-03,         1.61210870e-03, -1.94701169e-03, -2.98406805e-03, -1.40641451e-03,         7.92072017e-04,  1.71368839e-03,  1.03170475e-03, -2.24634461e-04,        -9.00613493e-04, -6.65269542e-04, -5.26718682e-06,  4.27613723e-04,         3.82692382e-04,  6.67936231e-05, -1.79854873e-04, -1.96856983e-04,        -6.08234217e-05,  6.47981575e-05,  9.00928771e-05,  3.83406311e-05,        -1.86613925e-05, -3.62596319e-05, -1.93456704e-05,  3.48016653e-06,         1.25871101e-05,  8.05925563e-06,  1.22378424e-07, -3.65381785e-06,        -2.75388846e-06, -4.17198277e-07,  8.42507181e-07,  7.45665718e-07,         1.85982175e-07, -1.40444127e-07, -1.48190233e-07, -4.63388568e-08,         1.37236447e-08,  1.80120709e-08,  5.77858888e-09, -3.79449254e-10,        -6.59606719e-10} \
+   CONFIG.Coefficient_Fractional_Bits {16} \
    CONFIG.Coefficient_Reload {false} \
    CONFIG.Coefficient_Sets {1} \
    CONFIG.Coefficient_Sign {Signed} \
@@ -222,6 +222,7 @@ proc create_hier_cell_filterI { parentCell nameHier } {
    CONFIG.Coefficient_Width {16} \
    CONFIG.ColumnConfig {7} \
    CONFIG.DATA_Has_TLAST {Packet_Framing} \
+   CONFIG.Data_Fractional_Bits {0} \
    CONFIG.Data_Width {32} \
    CONFIG.Decimation_Rate {10} \
    CONFIG.Filter_Architecture {Systolic_Multiply_Accumulate} \
@@ -233,7 +234,7 @@ proc create_hier_cell_filterI { parentCell nameHier } {
    CONFIG.Number_Channels {2} \
    CONFIG.Output_Rounding_Mode {Non_Symmetric_Rounding_Up} \
    CONFIG.Output_Width {32} \
-   CONFIG.Quantization {Integer_Coefficients} \
+   CONFIG.Quantization {Quantize_Only} \
    CONFIG.RateSpecification {Frequency_Specification} \
    CONFIG.S_DATA_Has_TUSER {Not_Required} \
    CONFIG.Sample_Frequency {100} \
@@ -244,7 +245,9 @@ proc create_hier_cell_filterI { parentCell nameHier } {
   # Create instance: fir_dma, and set properties
   set fir_dma [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_dma:7.1 fir_dma ]
   set_property -dict [ list \
+   CONFIG.c_include_s2mm_dre {0} \
    CONFIG.c_include_sg {0} \
+   CONFIG.c_m_axis_mm2s_tdata_width {32} \
    CONFIG.c_sg_include_stscntrl_strm {0} \
    CONFIG.c_sg_length_width {23} \
  ] $fir_dma
@@ -311,8 +314,8 @@ proc create_root_design { parentCell } {
    CONFIG.NUM_SI {1} \
  ] $axi_smc
 
-  # Create instance: filterI
-  create_hier_cell_filterI [current_bd_instance .] filterI
+  # Create instance: filter
+  create_hier_cell_filter [current_bd_instance .] filter
 
   # Create instance: processing_system7_0, and set properties
   set processing_system7_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:processing_system7:5.5 processing_system7_0 ]
@@ -1091,28 +1094,28 @@ proc create_root_design { parentCell } {
   set rst_ps7_0_100M [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset:5.0 rst_ps7_0_100M ]
 
   # Create interface connections
-  connect_bd_intf_net -intf_net axi_smc_M00_AXI [get_bd_intf_pins axi_smc/M00_AXI] [get_bd_intf_pins filterI/S_AXI_LITE]
-  connect_bd_intf_net -intf_net filterI_M00_AXI [get_bd_intf_pins filterI/M00_AXI] [get_bd_intf_pins processing_system7_0/S_AXI_HP0]
+  connect_bd_intf_net -intf_net axi_smc_M00_AXI [get_bd_intf_pins axi_smc/M00_AXI] [get_bd_intf_pins filter/S_AXI_LITE]
+  connect_bd_intf_net -intf_net filterI_M00_AXI [get_bd_intf_pins filter/M00_AXI] [get_bd_intf_pins processing_system7_0/S_AXI_HP0]
   connect_bd_intf_net -intf_net processing_system7_0_DDR [get_bd_intf_ports DDR] [get_bd_intf_pins processing_system7_0/DDR]
   connect_bd_intf_net -intf_net processing_system7_0_FIXED_IO [get_bd_intf_ports FIXED_IO] [get_bd_intf_pins processing_system7_0/FIXED_IO]
   connect_bd_intf_net -intf_net processing_system7_0_M_AXI_GP0 [get_bd_intf_pins axi_smc/S00_AXI] [get_bd_intf_pins processing_system7_0/M_AXI_GP0]
 
   # Create port connections
-  connect_bd_net -net processing_system7_0_FCLK_CLK0 [get_bd_pins axi_smc/aclk] [get_bd_pins filterI/aclk] [get_bd_pins processing_system7_0/FCLK_CLK0] [get_bd_pins processing_system7_0/M_AXI_GP0_ACLK] [get_bd_pins processing_system7_0/S_AXI_HP0_ACLK] [get_bd_pins rst_ps7_0_100M/slowest_sync_clk]
+  connect_bd_net -net processing_system7_0_FCLK_CLK0 [get_bd_pins axi_smc/aclk] [get_bd_pins filter/aclk] [get_bd_pins processing_system7_0/FCLK_CLK0] [get_bd_pins processing_system7_0/M_AXI_GP0_ACLK] [get_bd_pins processing_system7_0/S_AXI_HP0_ACLK] [get_bd_pins rst_ps7_0_100M/slowest_sync_clk]
   connect_bd_net -net processing_system7_0_FCLK_RESET0_N [get_bd_pins processing_system7_0/FCLK_RESET0_N] [get_bd_pins rst_ps7_0_100M/ext_reset_in]
-  connect_bd_net -net rst_ps7_0_100M_peripheral_aresetn [get_bd_pins axi_smc/aresetn] [get_bd_pins filterI/aresetn] [get_bd_pins filterI/axi_resetn] [get_bd_pins rst_ps7_0_100M/peripheral_aresetn]
+  connect_bd_net -net rst_ps7_0_100M_peripheral_aresetn [get_bd_pins axi_smc/aresetn] [get_bd_pins filter/aresetn] [get_bd_pins filter/axi_resetn] [get_bd_pins rst_ps7_0_100M/peripheral_aresetn]
 
   # Create address segments
-  create_bd_addr_seg -range 0x00010000 -offset 0x40400000 [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs filterI/fir_dma/S_AXI_LITE/Reg] SEG_axi_dma_0_Reg
-  create_bd_addr_seg -range 0x20000000 -offset 0x00000000 [get_bd_addr_spaces filterI/fir_dma/Data_MM2S] [get_bd_addr_segs processing_system7_0/S_AXI_HP0/HP0_DDR_LOWOCM] SEG_processing_system7_0_HP0_DDR_LOWOCM
-  create_bd_addr_seg -range 0x20000000 -offset 0x00000000 [get_bd_addr_spaces filterI/fir_dma/Data_S2MM] [get_bd_addr_segs processing_system7_0/S_AXI_HP0/HP0_DDR_LOWOCM] SEG_processing_system7_0_HP0_DDR_LOWOCM
+  create_bd_addr_seg -range 0x00010000 -offset 0x40400000 [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs filter/fir_dma/S_AXI_LITE/Reg] SEG_axi_dma_0_Reg
+  create_bd_addr_seg -range 0x20000000 -offset 0x00000000 [get_bd_addr_spaces filter/fir_dma/Data_MM2S] [get_bd_addr_segs processing_system7_0/S_AXI_HP0/HP0_DDR_LOWOCM] SEG_processing_system7_0_HP0_DDR_LOWOCM
+  create_bd_addr_seg -range 0x20000000 -offset 0x00000000 [get_bd_addr_spaces filter/fir_dma/Data_S2MM] [get_bd_addr_segs processing_system7_0/S_AXI_HP0/HP0_DDR_LOWOCM] SEG_processing_system7_0_HP0_DDR_LOWOCM
 
   # Exclude Address Segments
-  create_bd_addr_seg -range 0x00010000 -offset 0x40400000 [get_bd_addr_spaces filterI/fir_dma/Data_MM2S] [get_bd_addr_segs filterI/fir_dma/S_AXI_LITE/Reg] SEG_fir_dma_Reg
-  exclude_bd_addr_seg [get_bd_addr_segs filterI/fir_dma/Data_MM2S/SEG_fir_dma_Reg]
+  create_bd_addr_seg -range 0x00010000 -offset 0x40400000 [get_bd_addr_spaces filter/fir_dma/Data_MM2S] [get_bd_addr_segs filter/fir_dma/S_AXI_LITE/Reg] SEG_fir_dma_Reg
+  exclude_bd_addr_seg [get_bd_addr_segs filter/fir_dma/Data_MM2S/SEG_fir_dma_Reg]
 
-  create_bd_addr_seg -range 0x00010000 -offset 0x40400000 [get_bd_addr_spaces filterI/fir_dma/Data_S2MM] [get_bd_addr_segs filterI/fir_dma/S_AXI_LITE/Reg] SEG_fir_dma_Reg
-  exclude_bd_addr_seg [get_bd_addr_segs filterI/fir_dma/Data_S2MM/SEG_fir_dma_Reg]
+  create_bd_addr_seg -range 0x00010000 -offset 0x40400000 [get_bd_addr_spaces filter/fir_dma/Data_S2MM] [get_bd_addr_segs filter/fir_dma/S_AXI_LITE/Reg] SEG_fir_dma_Reg
+  exclude_bd_addr_seg [get_bd_addr_segs filter/fir_dma/Data_S2MM/SEG_fir_dma_Reg]
 
 
 
