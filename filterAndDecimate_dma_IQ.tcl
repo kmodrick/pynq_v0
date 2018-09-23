@@ -217,7 +217,7 @@ proc create_hier_cell_filter { parentCell nameHier } {
    CONFIG.Interpolation_Rate {1} \
    CONFIG.M_DATA_Has_TREADY {true} \
    CONFIG.Number_Channels {1} \
-   CONFIG.Number_Paths {2} \
+   CONFIG.Number_Paths {1} \
    CONFIG.Output_Rounding_Mode {Non_Symmetric_Rounding_Up} \
    CONFIG.Output_Width {16} \
    CONFIG.RateSpecification {Frequency_Specification} \
