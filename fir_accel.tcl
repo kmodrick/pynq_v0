@@ -255,8 +255,7 @@ proc create_hier_cell_filter { parentCell nameHier } {
   # Create interface connections
   connect_bd_intf_net -intf_net Conn1 [get_bd_intf_pins S_AXI_LITE] [get_bd_intf_pins fir_dma/S_AXI_LITE]
   connect_bd_intf_net -intf_net Conn2 [get_bd_intf_pins M00_AXI] [get_bd_intf_pins axi_smc/M00_AXI]
-  connect_bd_intf_net -intf_net axi_dma_0_M_AXIS_MM2S [get_bd_intf_pins fir/S_AXIS_DATA] [get_bd_intf_pins fir_dma/M_AXIS_MM2S]
-  connect_bd_intf_net -intf_net fir_compiler_0_M_AXIS_DATA [get_bd_intf_pins fir/M_AXIS_DATA] [get_bd_intf_pins fir_dma/S_AXIS_S2MM]
+  connect_bd_intf_net -intf_net fir_dma_M_AXIS_MM2S [get_bd_intf_pins fir_dma/M_AXIS_MM2S] [get_bd_intf_pins fir_dma/S_AXIS_S2MM]
   connect_bd_intf_net -intf_net fir_dma_M_AXI_MM2S [get_bd_intf_pins axi_smc/S00_AXI] [get_bd_intf_pins fir_dma/M_AXI_MM2S]
   connect_bd_intf_net -intf_net fir_dma_M_AXI_S2MM [get_bd_intf_pins axi_smc/S01_AXI] [get_bd_intf_pins fir_dma/M_AXI_S2MM]
 
