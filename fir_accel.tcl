@@ -124,9 +124,11 @@ set bCheckIPsPassed 1
 set bCheckIPs 1
 if { $bCheckIPs == 1 } {
    set list_check_ips "\ 
+xilinx.com:user:audio_direct:1.1\
 xilinx.com:ip:smartconnect:1.0\
 xilinx.com:ip:processing_system7:5.5\
 xilinx.com:ip:proc_sys_reset:5.0\
+xilinx.com:ip:xlconstant:1.1\
 xilinx.com:ip:fir_compiler:7.2\
 xilinx.com:ip:axi_dma:7.1\
 "
@@ -194,6 +196,7 @@ proc create_hier_cell_filter { parentCell nameHier } {
 
   # Create interface pins
   create_bd_intf_pin -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 M00_AXI
+  create_bd_intf_pin -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 M01_AXI
   create_bd_intf_pin -mode Slave -vlnv xilinx.com:interface:aximm_rtl:1.0 S_AXI_LITE
 
   # Create pins
@@ -204,6 +207,7 @@ proc create_hier_cell_filter { parentCell nameHier } {
   # Create instance: axi_smc, and set properties
   set axi_smc [ create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect:1.0 axi_smc ]
   set_property -dict [ list \
+   CONFIG.NUM_MI {2} \
    CONFIG.NUM_SI {2} \
  ] $axi_smc
 
@@ -255,6 +259,7 @@ proc create_hier_cell_filter { parentCell nameHier } {
   # Create interface connections
   connect_bd_intf_net -intf_net Conn1 [get_bd_intf_pins S_AXI_LITE] [get_bd_intf_pins fir_dma/S_AXI_LITE]
   connect_bd_intf_net -intf_net Conn2 [get_bd_intf_pins M00_AXI] [get_bd_intf_pins axi_smc/M00_AXI]
+  connect_bd_intf_net -intf_net axi_smc_M01_AXI [get_bd_intf_pins M01_AXI] [get_bd_intf_pins axi_smc/M01_AXI]
   connect_bd_intf_net -intf_net fir_dma_M_AXIS_MM2S [get_bd_intf_pins fir_dma/M_AXIS_MM2S] [get_bd_intf_pins fir_dma/S_AXIS_S2MM]
   connect_bd_intf_net -intf_net fir_dma_M_AXI_MM2S [get_bd_intf_pins axi_smc/S00_AXI] [get_bd_intf_pins fir_dma/M_AXI_MM2S]
   connect_bd_intf_net -intf_net fir_dma_M_AXI_S2MM [get_bd_intf_pins axi_smc/S01_AXI] [get_bd_intf_pins fir_dma/M_AXI_S2MM]
@@ -306,10 +311,27 @@ proc create_root_design { parentCell } {
   set FIXED_IO [ create_bd_intf_port -mode Master -vlnv xilinx.com:display_processing_system7:fixedio_rtl:1.0 FIXED_IO ]
 
   # Create ports
+  set pdm_audio_shutdown [ create_bd_port -dir O pdm_audio_shutdown ]
+  set pdm_m_clk [ create_bd_port -dir O pdm_m_clk ]
+  set pwm_audio_o [ create_bd_port -dir O pwm_audio_o ]
+
+  # Create instance: audio_direct_0, and set properties
+  set audio_direct_0 [ create_bd_cell -type ip -vlnv xilinx.com:user:audio_direct:1.1 audio_direct_0 ]
+
+  # Create instance: axi_interconnect_0, and set properties
+  set axi_interconnect_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 axi_interconnect_0 ]
+  set_property -dict [ list \
+   CONFIG.ENABLE_ADVANCED_OPTIONS {1} \
+   CONFIG.ENABLE_PROTOCOL_CHECKERS {0} \
+   CONFIG.NUM_MI {1} \
+   CONFIG.PCHK_MAX_RD_BURSTS {8} \
+   CONFIG.PCHK_MAX_WR_BURSTS {8} \
+ ] $axi_interconnect_0
 
   # Create instance: axi_smc, and set properties
   set axi_smc [ create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect:1.0 axi_smc ]
   set_property -dict [ list \
+   CONFIG.NUM_MI {1} \
    CONFIG.NUM_SI {1} \
  ] $axi_smc
 
@@ -1092,29 +1114,40 @@ proc create_root_design { parentCell } {
   # Create instance: rst_ps7_0_100M, and set properties
   set rst_ps7_0_100M [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset:5.0 rst_ps7_0_100M ]
 
+  # Create instance: xlconstant_0, and set properties
+  set xlconstant_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:xlconstant:1.1 xlconstant_0 ]
+  set_property -dict [ list \
+   CONFIG.CONST_VAL {0} \
+ ] $xlconstant_0
+
   # Create interface connections
+  connect_bd_intf_net -intf_net axi_interconnect_0_M00_AXI [get_bd_intf_pins audio_direct_0/S_AXI] [get_bd_intf_pins axi_interconnect_0/M00_AXI]
   connect_bd_intf_net -intf_net axi_smc_M00_AXI [get_bd_intf_pins axi_smc/M00_AXI] [get_bd_intf_pins filter/S_AXI_LITE]
-  connect_bd_intf_net -intf_net filterI_M00_AXI [get_bd_intf_pins filter/M00_AXI] [get_bd_intf_pins processing_system7_0/S_AXI_HP0]
+  connect_bd_intf_net -intf_net filter_M00_AXI [get_bd_intf_pins filter/M00_AXI] [get_bd_intf_pins processing_system7_0/S_AXI_HP0]
+  connect_bd_intf_net -intf_net filter_M01_AXI [get_bd_intf_pins axi_interconnect_0/S00_AXI] [get_bd_intf_pins filter/M01_AXI]
   connect_bd_intf_net -intf_net processing_system7_0_DDR [get_bd_intf_ports DDR] [get_bd_intf_pins processing_system7_0/DDR]
   connect_bd_intf_net -intf_net processing_system7_0_FIXED_IO [get_bd_intf_ports FIXED_IO] [get_bd_intf_pins processing_system7_0/FIXED_IO]
   connect_bd_intf_net -intf_net processing_system7_0_M_AXI_GP0 [get_bd_intf_pins axi_smc/S00_AXI] [get_bd_intf_pins processing_system7_0/M_AXI_GP0]
 
   # Create port connections
-  connect_bd_net -net processing_system7_0_FCLK_CLK0 [get_bd_pins axi_smc/aclk] [get_bd_pins filter/aclk] [get_bd_pins processing_system7_0/FCLK_CLK0] [get_bd_pins processing_system7_0/M_AXI_GP0_ACLK] [get_bd_pins processing_system7_0/S_AXI_HP0_ACLK] [get_bd_pins rst_ps7_0_100M/slowest_sync_clk]
+  connect_bd_net -net audio_direct_0_audio_out [get_bd_ports pwm_audio_o] [get_bd_pins audio_direct_0/audio_out]
+  connect_bd_net -net audio_direct_0_audio_shutdown [get_bd_ports pdm_audio_shutdown] [get_bd_pins audio_direct_0/audio_shutdown]
+  connect_bd_net -net audio_direct_0_pdm_clk [get_bd_ports pdm_m_clk] [get_bd_pins audio_direct_0/pdm_clk]
+  connect_bd_net -net processing_system7_0_FCLK_CLK0 [get_bd_pins audio_direct_0/s_axi_aclk] [get_bd_pins axi_interconnect_0/ACLK] [get_bd_pins axi_interconnect_0/M00_ACLK] [get_bd_pins axi_interconnect_0/S00_ACLK] [get_bd_pins axi_smc/aclk] [get_bd_pins filter/aclk] [get_bd_pins processing_system7_0/FCLK_CLK0] [get_bd_pins processing_system7_0/M_AXI_GP0_ACLK] [get_bd_pins processing_system7_0/S_AXI_HP0_ACLK] [get_bd_pins rst_ps7_0_100M/slowest_sync_clk]
   connect_bd_net -net processing_system7_0_FCLK_RESET0_N [get_bd_pins processing_system7_0/FCLK_RESET0_N] [get_bd_pins rst_ps7_0_100M/ext_reset_in]
-  connect_bd_net -net rst_ps7_0_100M_peripheral_aresetn [get_bd_pins axi_smc/aresetn] [get_bd_pins filter/aresetn] [get_bd_pins filter/axi_resetn] [get_bd_pins rst_ps7_0_100M/peripheral_aresetn]
+  connect_bd_net -net rst_ps7_0_100M_interconnect_aresetn [get_bd_pins axi_interconnect_0/ARESETN] [get_bd_pins rst_ps7_0_100M/interconnect_aresetn]
+  connect_bd_net -net rst_ps7_0_100M_peripheral_aresetn [get_bd_pins audio_direct_0/s_axi_aresetn] [get_bd_pins axi_interconnect_0/M00_ARESETN] [get_bd_pins axi_interconnect_0/S00_ARESETN] [get_bd_pins axi_smc/aresetn] [get_bd_pins filter/aresetn] [get_bd_pins filter/axi_resetn] [get_bd_pins rst_ps7_0_100M/peripheral_aresetn]
+  connect_bd_net -net xlconstant_0_dout [get_bd_pins audio_direct_0/audio_in] [get_bd_pins audio_direct_0/sel_direct] [get_bd_pins xlconstant_0/dout]
 
   # Create address segments
-  create_bd_addr_seg -range 0x00010000 -offset 0x40400000 [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs filter/fir_dma/S_AXI_LITE/Reg] SEG_axi_dma_0_Reg
+  create_bd_addr_seg -range 0x00010000 -offset 0x40400000 [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs filter/fir_dma/S_AXI_LITE/Reg] SEG_fir_dma_Reg
+  create_bd_addr_seg -range 0x00010000 -offset 0x44A00000 [get_bd_addr_spaces filter/fir_dma/Data_S2MM] [get_bd_addr_segs audio_direct_0/S_AXI/S_AXI_reg] SEG_audio_direct_0_S_AXI_reg
   create_bd_addr_seg -range 0x20000000 -offset 0x00000000 [get_bd_addr_spaces filter/fir_dma/Data_MM2S] [get_bd_addr_segs processing_system7_0/S_AXI_HP0/HP0_DDR_LOWOCM] SEG_processing_system7_0_HP0_DDR_LOWOCM
   create_bd_addr_seg -range 0x20000000 -offset 0x00000000 [get_bd_addr_spaces filter/fir_dma/Data_S2MM] [get_bd_addr_segs processing_system7_0/S_AXI_HP0/HP0_DDR_LOWOCM] SEG_processing_system7_0_HP0_DDR_LOWOCM
 
   # Exclude Address Segments
-  create_bd_addr_seg -range 0x00010000 -offset 0x40400000 [get_bd_addr_spaces filter/fir_dma/Data_MM2S] [get_bd_addr_segs filter/fir_dma/S_AXI_LITE/Reg] SEG_fir_dma_Reg
-  exclude_bd_addr_seg [get_bd_addr_segs filter/fir_dma/Data_MM2S/SEG_fir_dma_Reg]
-
-  create_bd_addr_seg -range 0x00010000 -offset 0x40400000 [get_bd_addr_spaces filter/fir_dma/Data_S2MM] [get_bd_addr_segs filter/fir_dma/S_AXI_LITE/Reg] SEG_fir_dma_Reg
-  exclude_bd_addr_seg [get_bd_addr_segs filter/fir_dma/Data_S2MM/SEG_fir_dma_Reg]
+  create_bd_addr_seg -range 0x00010000 -offset 0x44A00000 [get_bd_addr_spaces filter/fir_dma/Data_MM2S] [get_bd_addr_segs audio_direct_0/S_AXI/S_AXI_reg] SEG_audio_direct_0_S_AXI_reg
+  exclude_bd_addr_seg [get_bd_addr_segs filter/fir_dma/Data_MM2S/SEG_audio_direct_0_S_AXI_reg]
 
 
 
