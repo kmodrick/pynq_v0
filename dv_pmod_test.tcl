@@ -125,7 +125,6 @@ set bCheckIPs 1
 if { $bCheckIPs == 1 } {
    set list_check_ips "\ 
 xilinx.com:ip:smartconnect:1.0\
-kratos.us:user:dv_test:1.0\
 kratos.us:user:pmod_I2S:1.0\
 xilinx.com:ip:processing_system7:5.5\
 xilinx.com:ip:proc_sys_reset:5.0\
@@ -328,9 +327,6 @@ proc create_root_design { parentCell } {
   set_property -dict [ list \
    CONFIG.NUM_SI {1} \
  ] $axi_smc
-
-  # Create instance: dv_test_0, and set properties
-  set dv_test_0 [ create_bd_cell -type ip -vlnv kratos.us:user:dv_test:1.0 dv_test_0 ]
 
   # Create instance: filter
   create_hier_cell_filter [current_bd_instance .] filter
@@ -1134,10 +1130,8 @@ proc create_root_design { parentCell } {
   connect_bd_intf_net -intf_net processing_system7_0_M_AXI_GP0 [get_bd_intf_pins axi_smc/S00_AXI] [get_bd_intf_pins processing_system7_0/M_AXI_GP0]
 
   # Create port connections
-  connect_bd_net -net dv_test_0_LeftData [get_bd_pins dv_test_0/LeftData] [get_bd_pins pmod_I2S_0/LeftData]
-  connect_bd_net -net dv_test_0_RightData [get_bd_pins dv_test_0/RightData] [get_bd_pins pmod_I2S_0/RightData]
   connect_bd_net -net filter_m_axis_mm2s_tdata [get_bd_pins filter/m_axis_mm2s_tdata] [get_bd_pins split_LR_data_0/DataIn]
-  connect_bd_net -net filter_m_axis_mm2s_tvalid [get_bd_pins dv_test_0/DVIn] [get_bd_pins filter/m_axis_mm2s_tvalid] [get_bd_pins pmod_I2S_0/DataValid]
+  connect_bd_net -net filter_m_axis_mm2s_tvalid [get_bd_pins filter/m_axis_mm2s_tvalid] [get_bd_pins pmod_I2S_0/DataValid]
   connect_bd_net -net pmod_I2S_0_LRCK [get_bd_pins pmod_I2S_0/LRCK] [get_bd_pins xlconcat_0/In1]
   connect_bd_net -net pmod_I2S_0_MCLK [get_bd_pins pmod_I2S_0/MCLK] [get_bd_pins xlconcat_0/In0]
   connect_bd_net -net pmod_I2S_0_SCK [get_bd_pins pmod_I2S_0/SCK] [get_bd_pins xlconcat_0/In2]
@@ -1145,6 +1139,8 @@ proc create_root_design { parentCell } {
   connect_bd_net -net processing_system7_0_FCLK_CLK0 [get_bd_pins axi_smc/aclk] [get_bd_pins filter/aclk] [get_bd_pins pmod_I2S_0/ClkIn] [get_bd_pins processing_system7_0/FCLK_CLK0] [get_bd_pins processing_system7_0/M_AXI_GP0_ACLK] [get_bd_pins processing_system7_0/S_AXI_HP0_ACLK] [get_bd_pins rst_ps7_0_12M/slowest_sync_clk]
   connect_bd_net -net processing_system7_0_FCLK_RESET0_N [get_bd_pins processing_system7_0/FCLK_RESET0_N] [get_bd_pins rst_ps7_0_12M/ext_reset_in]
   connect_bd_net -net rst_ps7_0_12M_peripheral_aresetn [get_bd_pins axi_smc/aresetn] [get_bd_pins filter/aresetn] [get_bd_pins filter/axi_resetn] [get_bd_pins rst_ps7_0_12M/peripheral_aresetn]
+  connect_bd_net -net split_LR_data_0_LeftData [get_bd_pins pmod_I2S_0/LeftData] [get_bd_pins split_LR_data_0/LeftData]
+  connect_bd_net -net split_LR_data_0_RightData [get_bd_pins pmod_I2S_0/RightData] [get_bd_pins split_LR_data_0/RightData]
   connect_bd_net -net xlconcat_0_dout [get_bd_ports pmodJA] [get_bd_pins xlconcat_0/dout]
   connect_bd_net -net xlconstant_0_dout [get_bd_pins filter/m_axis_mm2s_tready] [get_bd_pins xlconstant_0/dout]
 
