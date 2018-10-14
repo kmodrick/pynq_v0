@@ -124,13 +124,15 @@ set bCheckIPsPassed 1
 set bCheckIPs 1
 if { $bCheckIPs == 1 } {
    set list_check_ips "\ 
-xilinx.com:ip:axi_dma:7.1\
-digilentinc.com:user:axi_i2s_adi:1.2\
 xilinx.com:ip:smartconnect:1.0\
+kratos.us:user:pmod_I2S:1.0\
 xilinx.com:ip:processing_system7:5.5\
 xilinx.com:ip:proc_sys_reset:5.0\
+kratos.us:user:split_LR_data:1.0\
 xilinx.com:ip:xlconcat:2.1\
+xilinx.com:ip:xlconstant:1.1\
 xilinx.com:ip:fir_compiler:7.2\
+xilinx.com:ip:axi_dma:7.1\
 "
 
    set list_ips_missing ""
@@ -203,6 +205,9 @@ proc create_hier_cell_filter { parentCell nameHier } {
   create_bd_pin -dir I -type clk aclk
   create_bd_pin -dir I -type rst aresetn
   create_bd_pin -dir I -type rst axi_resetn
+  create_bd_pin -dir O -from 31 -to 0 m_axis_mm2s_tdata
+  create_bd_pin -dir I m_axis_mm2s_tready
+  create_bd_pin -dir O m_axis_mm2s_tvalid
 
   # Create instance: axi_smc, and set properties
   set axi_smc [ create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect:1.0 axi_smc ]
@@ -216,7 +221,7 @@ proc create_hier_cell_filter { parentCell nameHier } {
   set_property -dict [ list \
    CONFIG.BestPrecision {true} \
    CONFIG.Channel_Sequence {Basic} \
-   CONFIG.Clock_Frequency {200} \
+   CONFIG.Clock_Frequency {24.6914} \
    CONFIG.CoefficientSource {Vector} \
    CONFIG.CoefficientVector {0.09502063,0.10832208,0.12129644,0.13185154,0.13566494,0.12653801 ,0.09719703,0.04047928,-0.0492178,-0.17439533,-0.33302079,-0.51741395,-0.71364199,-0.90157206,-1.05566588,-1.14652185,-1.1430849,-1.01536144,-0.73740699,-0.29030449,0.3351698,1.13648631,2.09815966,3.19158537 ,4.37600428,5.60057765,6.80744698,7.93555249,8.92490345,9.72094045 ,10.27861131,10.56579979,10.56579979,10.27861131,9.72094045,8.92490345 ,7.93555249,6.80744698,5.60057765,4.37600428,3.19158537,2.09815966 ,1.13648631,0.3351698,-0.29030449,-0.73740699,-1.01536144,-1.1430849 ,-1.14652185,-1.05566588,-0.90157206,-0.71364199,-0.51741395,-0.33302079 ,-0.17439533,-0.0492178,0.04047928,0.09719703,0.12653801,0.13566494 ,0.13185154,0.12129644,0.10832208,0.09502063} \
    CONFIG.Coefficient_Fractional_Bits {11} \
@@ -242,7 +247,7 @@ proc create_hier_cell_filter { parentCell nameHier } {
    CONFIG.Quantization {Quantize_Only} \
    CONFIG.RateSpecification {Frequency_Specification} \
    CONFIG.S_DATA_Has_TUSER {Not_Required} \
-   CONFIG.Sample_Frequency {100} \
+   CONFIG.Sample_Frequency {12.345679} \
    CONFIG.Select_Pattern {All} \
    CONFIG.Zero_Pack_Factor {1} \
  ] $fir
@@ -261,7 +266,7 @@ proc create_hier_cell_filter { parentCell nameHier } {
   connect_bd_intf_net -intf_net Conn1 [get_bd_intf_pins S_AXI_LITE] [get_bd_intf_pins fir_dma/S_AXI_LITE]
   connect_bd_intf_net -intf_net Conn2 [get_bd_intf_pins M00_AXI] [get_bd_intf_pins axi_smc/M00_AXI]
   connect_bd_intf_net -intf_net Conn3 [get_bd_intf_pins M01_AXI] [get_bd_intf_pins axi_smc/M01_AXI]
-  connect_bd_intf_net -intf_net fir_dma_M_AXIS_MM2S [get_bd_intf_pins fir_dma/M_AXIS_MM2S] [get_bd_intf_pins fir_dma/S_AXIS_S2MM]
+  connect_bd_intf_net -intf_net fir_M_AXIS_DATA [get_bd_intf_pins fir/M_AXIS_DATA] [get_bd_intf_pins fir_dma/S_AXIS_S2MM]
   connect_bd_intf_net -intf_net fir_dma_M_AXI_MM2S [get_bd_intf_pins axi_smc/S00_AXI] [get_bd_intf_pins fir_dma/M_AXI_MM2S]
   connect_bd_intf_net -intf_net fir_dma_M_AXI_S2MM [get_bd_intf_pins axi_smc/S01_AXI] [get_bd_intf_pins fir_dma/M_AXI_S2MM]
 
@@ -269,6 +274,9 @@ proc create_hier_cell_filter { parentCell nameHier } {
   connect_bd_net -net aclk_1 [get_bd_pins aclk] [get_bd_pins axi_smc/aclk] [get_bd_pins fir/aclk] [get_bd_pins fir_dma/m_axi_mm2s_aclk] [get_bd_pins fir_dma/m_axi_s2mm_aclk] [get_bd_pins fir_dma/s_axi_lite_aclk]
   connect_bd_net -net aresetn_1 [get_bd_pins aresetn] [get_bd_pins axi_smc/aresetn]
   connect_bd_net -net axi_resetn_1 [get_bd_pins axi_resetn] [get_bd_pins fir_dma/axi_resetn]
+  connect_bd_net -net fir_dma_m_axis_mm2s_tdata [get_bd_pins m_axis_mm2s_tdata] [get_bd_pins fir_dma/m_axis_mm2s_tdata]
+  connect_bd_net -net fir_dma_m_axis_mm2s_tvalid [get_bd_pins m_axis_mm2s_tvalid] [get_bd_pins fir_dma/m_axis_mm2s_tvalid]
+  connect_bd_net -net m_axis_mm2s_tready_1 [get_bd_pins m_axis_mm2s_tready] [get_bd_pins fir_dma/m_axis_mm2s_tready]
 
   # Restore current instance
   current_bd_instance $oldCurInst
@@ -309,34 +317,22 @@ proc create_root_design { parentCell } {
 
   # Create interface ports
   set DDR [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:ddrx_rtl:1.0 DDR ]
+  set FIXED_IO [ create_bd_intf_port -mode Master -vlnv xilinx.com:display_processing_system7:fixedio_rtl:1.0 FIXED_IO ]
 
   # Create ports
   set pmodJA [ create_bd_port -dir O -from 3 -to 0 pmodJA ]
 
-  # Create instance: axi_dma_0, and set properties
-  set axi_dma_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_dma:7.1 axi_dma_0 ]
-  set_property -dict [ list \
-   CONFIG.c_include_mm2s {1} \
-   CONFIG.c_include_s2mm {0} \
-   CONFIG.c_include_sg {0} \
-   CONFIG.c_sg_include_stscntrl_strm {0} \
- ] $axi_dma_0
-
-  # Create instance: axi_i2s_adi_0, and set properties
-  set axi_i2s_adi_0 [ create_bd_cell -type ip -vlnv digilentinc.com:user:axi_i2s_adi:1.2 axi_i2s_adi_0 ]
-  set_property -dict [ list \
-   CONFIG.C_HAS_RX {0} \
- ] $axi_i2s_adi_0
-
   # Create instance: axi_smc, and set properties
   set axi_smc [ create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect:1.0 axi_smc ]
   set_property -dict [ list \
-   CONFIG.NUM_MI {1} \
    CONFIG.NUM_SI {1} \
  ] $axi_smc
 
   # Create instance: filter
   create_hier_cell_filter [current_bd_instance .] filter
+
+  # Create instance: pmod_I2S_0, and set properties
+  set pmod_I2S_0 [ create_bd_cell -type ip -vlnv kratos.us:user:pmod_I2S:1.0 pmod_I2S_0 ]
 
   # Create instance: processing_system7_0, and set properties
   set processing_system7_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:processing_system7:5.5 processing_system7_0 ]
@@ -348,7 +344,7 @@ proc create_root_design { parentCell } {
    CONFIG.PCW_ACT_DCI_PERIPHERAL_FREQMHZ {10.096154} \
    CONFIG.PCW_ACT_ENET0_PERIPHERAL_FREQMHZ {125.000000} \
    CONFIG.PCW_ACT_ENET1_PERIPHERAL_FREQMHZ {10.000000} \
-   CONFIG.PCW_ACT_FPGA0_PERIPHERAL_FREQMHZ {100.000000} \
+   CONFIG.PCW_ACT_FPGA0_PERIPHERAL_FREQMHZ {12.345679} \
    CONFIG.PCW_ACT_FPGA1_PERIPHERAL_FREQMHZ {10.000000} \
    CONFIG.PCW_ACT_FPGA2_PERIPHERAL_FREQMHZ {10.000000} \
    CONFIG.PCW_ACT_FPGA3_PERIPHERAL_FREQMHZ {10.000000} \
@@ -386,7 +382,7 @@ proc create_root_design { parentCell } {
    CONFIG.PCW_CAN_PERIPHERAL_DIVISOR1 {1} \
    CONFIG.PCW_CAN_PERIPHERAL_FREQMHZ {100} \
    CONFIG.PCW_CAN_PERIPHERAL_VALID {0} \
-   CONFIG.PCW_CLK0_FREQ {100000000} \
+   CONFIG.PCW_CLK0_FREQ {12345679} \
    CONFIG.PCW_CLK1_FREQ {10000000} \
    CONFIG.PCW_CLK2_FREQ {10000000} \
    CONFIG.PCW_CLK3_FREQ {10000000} \
@@ -510,8 +506,8 @@ proc create_root_design { parentCell } {
    CONFIG.PCW_EN_USB1 {0} \
    CONFIG.PCW_EN_WDT {0} \
    CONFIG.PCW_FCLK0_PERIPHERAL_CLKSRC {IO PLL} \
-   CONFIG.PCW_FCLK0_PERIPHERAL_DIVISOR0 {5} \
-   CONFIG.PCW_FCLK0_PERIPHERAL_DIVISOR1 {2} \
+   CONFIG.PCW_FCLK0_PERIPHERAL_DIVISOR0 {27} \
+   CONFIG.PCW_FCLK0_PERIPHERAL_DIVISOR1 {3} \
    CONFIG.PCW_FCLK1_PERIPHERAL_CLKSRC {IO PLL} \
    CONFIG.PCW_FCLK1_PERIPHERAL_DIVISOR0 {1} \
    CONFIG.PCW_FCLK1_PERIPHERAL_DIVISOR1 {1} \
@@ -525,7 +521,7 @@ proc create_root_design { parentCell } {
    CONFIG.PCW_FCLK_CLK1_BUF {FALSE} \
    CONFIG.PCW_FCLK_CLK2_BUF {FALSE} \
    CONFIG.PCW_FCLK_CLK3_BUF {FALSE} \
-   CONFIG.PCW_FPGA0_PERIPHERAL_FREQMHZ {100} \
+   CONFIG.PCW_FPGA0_PERIPHERAL_FREQMHZ {12.2880} \
    CONFIG.PCW_FPGA1_PERIPHERAL_FREQMHZ {50} \
    CONFIG.PCW_FPGA2_PERIPHERAL_FREQMHZ {50} \
    CONFIG.PCW_FPGA3_PERIPHERAL_FREQMHZ {50} \
@@ -867,7 +863,7 @@ proc create_root_design { parentCell } {
    CONFIG.PCW_PCAP_PERIPHERAL_CLKSRC {IO PLL} \
    CONFIG.PCW_PCAP_PERIPHERAL_DIVISOR0 {5} \
    CONFIG.PCW_PCAP_PERIPHERAL_FREQMHZ {200} \
-   CONFIG.PCW_PERIPHERAL_BOARD_PRESET {part0} \
+   CONFIG.PCW_PERIPHERAL_BOARD_PRESET {None} \
    CONFIG.PCW_PLL_BYPASSMODE_ENABLE {0} \
    CONFIG.PCW_PRESET_BANK0_VOLTAGE {LVCMOS 3.3V} \
    CONFIG.PCW_PRESET_BANK1_VOLTAGE {LVCMOS 1.8V} \
@@ -1111,14 +1107,11 @@ proc create_root_design { parentCell } {
    CONFIG.PCW_WDT_PERIPHERAL_FREQMHZ {133.333333} \
  ] $processing_system7_0
 
-  # Create instance: rst_ps7_0_100M, and set properties
-  set rst_ps7_0_100M [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset:5.0 rst_ps7_0_100M ]
+  # Create instance: rst_ps7_0_12M, and set properties
+  set rst_ps7_0_12M [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset:5.0 rst_ps7_0_12M ]
 
-  # Create instance: smartconnect_0, and set properties
-  set smartconnect_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect:1.0 smartconnect_0 ]
-  set_property -dict [ list \
-   CONFIG.NUM_SI {1} \
- ] $smartconnect_0
+  # Create instance: split_LR_data_0, and set properties
+  set split_LR_data_0 [ create_bd_cell -type ip -vlnv kratos.us:user:split_LR_data:1.0 split_LR_data_0 ]
 
   # Create instance: xlconcat_0, and set properties
   set xlconcat_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:xlconcat:2.1 xlconcat_0 ]
@@ -1126,41 +1119,35 @@ proc create_root_design { parentCell } {
    CONFIG.NUM_PORTS {4} \
  ] $xlconcat_0
 
+  # Create instance: xlconstant_0, and set properties
+  set xlconstant_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:xlconstant:1.1 xlconstant_0 ]
+
   # Create interface connections
-  connect_bd_intf_net -intf_net axi_dma_0_M_AXIS_MM2S [get_bd_intf_pins axi_dma_0/M_AXIS_MM2S] [get_bd_intf_pins axi_i2s_adi_0/S_AXIS]
-  connect_bd_intf_net -intf_net axi_dma_0_M_AXI_MM2S [get_bd_intf_pins axi_dma_0/M_AXI_MM2S] [get_bd_intf_pins smartconnect_0/S00_AXI]
   connect_bd_intf_net -intf_net axi_smc_M00_AXI [get_bd_intf_pins axi_smc/M00_AXI] [get_bd_intf_pins filter/S_AXI_LITE]
-  connect_bd_intf_net -intf_net filter_M00_AXI [get_bd_intf_pins filter/M00_AXI] [get_bd_intf_pins processing_system7_0/S_AXI_HP0]
-  connect_bd_intf_net -intf_net filter_M01_AXI [get_bd_intf_pins axi_dma_0/S_AXI_LITE] [get_bd_intf_pins filter/M01_AXI]
+  connect_bd_intf_net -intf_net filter_M01_AXI [get_bd_intf_pins filter/M01_AXI] [get_bd_intf_pins processing_system7_0/S_AXI_HP0]
   connect_bd_intf_net -intf_net processing_system7_0_DDR [get_bd_intf_ports DDR] [get_bd_intf_pins processing_system7_0/DDR]
+  connect_bd_intf_net -intf_net processing_system7_0_FIXED_IO [get_bd_intf_ports FIXED_IO] [get_bd_intf_pins processing_system7_0/FIXED_IO]
   connect_bd_intf_net -intf_net processing_system7_0_M_AXI_GP0 [get_bd_intf_pins axi_smc/S00_AXI] [get_bd_intf_pins processing_system7_0/M_AXI_GP0]
-  connect_bd_intf_net -intf_net smartconnect_0_M00_AXI [get_bd_intf_pins axi_i2s_adi_0/S00_AXI] [get_bd_intf_pins smartconnect_0/M00_AXI]
 
   # Create port connections
-  connect_bd_net -net axi_i2s_adi_0_BCLK_O [get_bd_pins axi_i2s_adi_0/BCLK_O] [get_bd_pins xlconcat_0/In0]
-  connect_bd_net -net axi_i2s_adi_0_LRCLK_O [get_bd_pins axi_i2s_adi_0/LRCLK_O] [get_bd_pins xlconcat_0/In1]
-  connect_bd_net -net axi_i2s_adi_0_MUTEN_O [get_bd_pins axi_i2s_adi_0/MUTEN_O] [get_bd_pins xlconcat_0/In2]
-  connect_bd_net -net axi_i2s_adi_0_SDATA_O [get_bd_pins axi_i2s_adi_0/SDATA_O] [get_bd_pins xlconcat_0/In3]
-  connect_bd_net -net processing_system7_0_FCLK_CLK0 [get_bd_pins axi_dma_0/m_axi_mm2s_aclk] [get_bd_pins axi_dma_0/s_axi_lite_aclk] [get_bd_pins axi_i2s_adi_0/S_AXIS_ACLK] [get_bd_pins axi_i2s_adi_0/s00_axi_aclk] [get_bd_pins axi_smc/aclk] [get_bd_pins filter/aclk] [get_bd_pins processing_system7_0/FCLK_CLK0] [get_bd_pins processing_system7_0/M_AXI_GP0_ACLK] [get_bd_pins processing_system7_0/S_AXI_HP0_ACLK] [get_bd_pins rst_ps7_0_100M/slowest_sync_clk] [get_bd_pins smartconnect_0/aclk]
-  connect_bd_net -net processing_system7_0_FCLK_RESET0_N [get_bd_pins processing_system7_0/FCLK_RESET0_N] [get_bd_pins rst_ps7_0_100M/ext_reset_in]
-  connect_bd_net -net rst_ps7_0_100M_peripheral_aresetn [get_bd_pins axi_dma_0/axi_resetn] [get_bd_pins axi_i2s_adi_0/s00_axi_aresetn] [get_bd_pins axi_smc/aresetn] [get_bd_pins filter/aresetn] [get_bd_pins filter/axi_resetn] [get_bd_pins rst_ps7_0_100M/peripheral_aresetn] [get_bd_pins smartconnect_0/aresetn]
+  connect_bd_net -net filter_m_axis_mm2s_tdata [get_bd_pins filter/m_axis_mm2s_tdata] [get_bd_pins split_LR_data_0/DataIn]
+  connect_bd_net -net filter_m_axis_mm2s_tvalid [get_bd_pins filter/m_axis_mm2s_tvalid] [get_bd_pins pmod_I2S_0/DataValid]
+  connect_bd_net -net pmod_I2S_0_LRCK [get_bd_pins pmod_I2S_0/LRCK] [get_bd_pins xlconcat_0/In1]
+  connect_bd_net -net pmod_I2S_0_MCLK [get_bd_pins pmod_I2S_0/MCLK] [get_bd_pins xlconcat_0/In0]
+  connect_bd_net -net pmod_I2S_0_SCK [get_bd_pins pmod_I2S_0/SCK] [get_bd_pins xlconcat_0/In2]
+  connect_bd_net -net pmod_I2S_0_SDIN [get_bd_pins pmod_I2S_0/SDIN] [get_bd_pins xlconcat_0/In3]
+  connect_bd_net -net processing_system7_0_FCLK_CLK0 [get_bd_pins axi_smc/aclk] [get_bd_pins filter/aclk] [get_bd_pins pmod_I2S_0/ClkIn] [get_bd_pins processing_system7_0/FCLK_CLK0] [get_bd_pins processing_system7_0/M_AXI_GP0_ACLK] [get_bd_pins processing_system7_0/S_AXI_HP0_ACLK] [get_bd_pins rst_ps7_0_12M/slowest_sync_clk]
+  connect_bd_net -net processing_system7_0_FCLK_RESET0_N [get_bd_pins processing_system7_0/FCLK_RESET0_N] [get_bd_pins rst_ps7_0_12M/ext_reset_in]
+  connect_bd_net -net rst_ps7_0_12M_peripheral_aresetn [get_bd_pins axi_smc/aresetn] [get_bd_pins filter/aresetn] [get_bd_pins filter/axi_resetn] [get_bd_pins rst_ps7_0_12M/peripheral_aresetn]
+  connect_bd_net -net split_LR_data_0_LeftData [get_bd_pins pmod_I2S_0/LeftData] [get_bd_pins split_LR_data_0/LeftData]
+  connect_bd_net -net split_LR_data_0_RightData [get_bd_pins pmod_I2S_0/RightData] [get_bd_pins split_LR_data_0/RightData]
   connect_bd_net -net xlconcat_0_dout [get_bd_ports pmodJA] [get_bd_pins xlconcat_0/dout]
+  connect_bd_net -net xlconstant_0_dout [get_bd_pins filter/m_axis_mm2s_tready] [get_bd_pins xlconstant_0/dout]
 
   # Create address segments
   create_bd_addr_seg -range 0x00010000 -offset 0x40400000 [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs filter/fir_dma/S_AXI_LITE/Reg] SEG_fir_dma_Reg
   create_bd_addr_seg -range 0x20000000 -offset 0x00000000 [get_bd_addr_spaces filter/fir_dma/Data_MM2S] [get_bd_addr_segs processing_system7_0/S_AXI_HP0/HP0_DDR_LOWOCM] SEG_processing_system7_0_HP0_DDR_LOWOCM
   create_bd_addr_seg -range 0x20000000 -offset 0x00000000 [get_bd_addr_spaces filter/fir_dma/Data_S2MM] [get_bd_addr_segs processing_system7_0/S_AXI_HP0/HP0_DDR_LOWOCM] SEG_processing_system7_0_HP0_DDR_LOWOCM
-
-  # Exclude Address Segments
-  create_bd_addr_seg -range 0x00010000 -offset 0x44A00000 [get_bd_addr_spaces axi_dma_0/Data_MM2S] [get_bd_addr_segs axi_i2s_adi_0/S00_AXI/S00_AXI_reg] SEG_axi_i2s_adi_0_S00_AXI_reg
-  exclude_bd_addr_seg [get_bd_addr_segs axi_dma_0/Data_MM2S/SEG_axi_i2s_adi_0_S00_AXI_reg]
-
-  create_bd_addr_seg -range 0x00010000 -offset 0x41E00000 [get_bd_addr_spaces filter/fir_dma/Data_MM2S] [get_bd_addr_segs axi_dma_0/S_AXI_LITE/Reg] SEG_axi_dma_0_Reg
-  exclude_bd_addr_seg [get_bd_addr_segs filter/fir_dma/Data_MM2S/SEG_axi_dma_0_Reg]
-
-  create_bd_addr_seg -range 0x00010000 -offset 0x41E00000 [get_bd_addr_spaces filter/fir_dma/Data_S2MM] [get_bd_addr_segs axi_dma_0/S_AXI_LITE/Reg] SEG_axi_dma_0_Reg
-  exclude_bd_addr_seg [get_bd_addr_segs filter/fir_dma/Data_S2MM/SEG_axi_dma_0_Reg]
-
 
 
   # Restore current instance
@@ -1177,6 +1164,4 @@ proc create_root_design { parentCell } {
 
 create_root_design ""
 
-
-common::send_msg_id "BD_TCL-1000" "WARNING" "This Tcl script was generated from a block design that has not been validated. It is possible that design <$design_name> may result in errors during validation."
 
